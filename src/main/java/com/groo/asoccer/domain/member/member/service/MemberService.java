@@ -3,6 +3,7 @@ package com.groo.asoccer.domain.member.member.service;
 import com.groo.asoccer.domain.member.member.entity.Member;
 import com.groo.asoccer.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     //회원가입
     public Member signup(String memberUserId, String memberPassword, String memberName,String memberPhone){
@@ -23,7 +25,7 @@ public class MemberService {
         Member member = new Member();
 
         member.setMemberUserId(memberUserId);
-        member.setMemberPassword(memberPassword);
+        member.setMemberPassword(passwordEncoder.encode(memberPassword));
         member.setMemberName(memberName);
         member.setMemberPhone(memberPhone);
 //        member.setMemberStatus(memberStatus);
@@ -41,7 +43,7 @@ public class MemberService {
         }
         Member member = optionalMember.get();
 
-        if(!member.getMemberPassword().equals(memberPassword)){
+        if(!passwordEncoder.matches(memberPassword, member.getMemberPassword())){
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
