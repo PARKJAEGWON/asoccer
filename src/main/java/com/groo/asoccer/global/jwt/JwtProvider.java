@@ -29,7 +29,8 @@ public class JwtProvider {
 
     public SecretKey getCachedSecretKey(){
         if(cachedSecretKey == null){
-            cachedSecretKey = cachedSecretKey = _getSecretKey(); //_내부적으로 사용제한을 둔 변수에게 붙여줌
+//            cachedSecretKey = cachedSecretKey = _getSecretKey(); //_내부적으로 사용제한을 둔 변수에게 붙여줌
+            cachedSecretKey = _getSecretKey();
         }
         return cachedSecretKey;
     }
@@ -53,16 +54,21 @@ public class JwtProvider {
 
     //리프레시 토큰
     public String generateRefreshToken(Member member){
-        return generateToken(member,60 * 60 * 24 * 365 * 1);
+        //수정하면서 바뀐 부분 쿠키가
+        //7일 후 만료되어 새로운 리프레시 토큰을 발급받아야 하는데
+        //DB에 저장된 토큰은 아직 1년 유효한 상태
+        //이로 인해 토큰 관리가 복잡해질 수 있음
+        return generateToken(member,60 * 60 * 24 * 7);
     }
 
     //토큰 만들기
     public String generateToken(Member member, int seconds){
+
         Map<String,Object> claims = new HashMap<>();
 
-        //claims 만들기
-        claims.put("id",member.getMemberUserId());
-        claims.put("username",member.getMemberName());
+        //claims 설정
+        claims.put("memberId",member.getId());
+        claims.put("memberLoginId",member.getMemberLoginId());
         long now = new Date().getTime();
 
         //유효기간 변수 만들기
@@ -77,4 +83,31 @@ public class JwtProvider {
                 .compact();
     }
 
+
+    //클레임 정보가져오기
+    public Map<String, Object> getClaims(String token) {
+        //라이브러리에서 꺼내온 파서 빌드 사용
+        String body = Jwts.parserBuilder()
+                .setSigningKey(getCachedSecretKey())//서명 검증
+                .build()
+                .parseClaimsJws(token)// 유효성 검사
+                .getBody()
+                .get("body", String.class);//jwt body부분만 호출
+        //ut에서 역직렬화
+        return Ut.toMap(body);
+    }
+
+    //유효성 검증
+    public boolean verify(String token){
+        try{
+            Jwts.parserBuilder()
+                    .setSigningKey(getCachedSecretKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
 }

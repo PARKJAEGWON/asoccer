@@ -34,6 +34,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("com.fasterxml.jackson.core:jackson-databind")
 
 	//JWT JWT는 토큰 표준이고 JJWT는 JWT를 처리하는 라이브러리
 	//JWT 기능 사용을 위한 인터페이스

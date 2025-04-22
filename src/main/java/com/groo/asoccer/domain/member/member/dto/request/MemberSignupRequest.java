@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class MemberSignupRequest {
 
-    private String memberUserId;
+    private String memberLoginId;
 
     private String memberPassword;
 

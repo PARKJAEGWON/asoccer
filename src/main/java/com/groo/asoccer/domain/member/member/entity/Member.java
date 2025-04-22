@@ -20,7 +20,7 @@ public class Member extends BaseEntity {
 
     @NotNull
     @Column(nullable = false, length = 50, unique = true)
-    private String memberUserId;
+    private String memberLoginId;
 
     @NotNull
     @Column(nullable = false)
@@ -37,6 +37,10 @@ public class Member extends BaseEntity {
     @NotNull
     @Column(nullable = false)
     private int memberStatus = 0; // 0:이용중, 8:회원탈퇴, 9:정지
+
+
+//    @JsonIgnore
+    private String memberRefreshToken;
 
 //    private Long memberLeaderTeamId;
 }
