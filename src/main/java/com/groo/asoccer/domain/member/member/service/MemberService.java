@@ -67,10 +67,15 @@ public class MemberService {
 
         return member;
     }
+    //로그아웃
+    public void logout(Member member){
+        member.setMemberRefreshToken(null);
+        memberRepository.save(member);
+    }
 
-    //마이페이지
-    public Member profile(String memberLoginId){
-        return memberRepository.findProfileByMemberLoginId(memberLoginId);
+    //유저 정보
+    public Member findByLoginId(String memberLoginId){
+        return memberRepository.getMemberLoginId(memberLoginId);
     }
 
     //토큰 유효성 검증
@@ -80,7 +85,7 @@ public class MemberService {
 
     //토큰 갱신
     public String refreshAccessToken(String memberRefreshToken){
-g
+
         Optional<Member> optionalMember = memberRepository.findByMemberRefreshToken(memberRefreshToken);
         if(optionalMember.isEmpty()){
             throw  new IllegalArgumentException("유효하지 않은 토큰입니다.");

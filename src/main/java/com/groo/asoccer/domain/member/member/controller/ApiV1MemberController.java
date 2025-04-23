@@ -66,6 +66,43 @@ public class ApiV1MemberController {
 
         return "로그인 성공";
     }
+
+    //로그아웃
+    @GetMapping("/logout")
+    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+
+        Cookie[] cookies = httpServletRequest.getCookies();
+
+        if(cookies != null){
+            // 변수 초기화 찾지 못했을 때 빈문자열로 초기화
+            String accessToken = "";
+            // 모든 쿠키를 순회하면서 "accessToken"이름을 가진 쿠키 찾기
+            for(Cookie cookie : cookies){
+                //쿠키.getName 쿠키클래스의 메소드 규약 "accessToken"내가 로그인할 때 이 이름으로 쿠키를 보냈음
+                if(cookie.getName().equals("accessToken")){
+                    accessToken = cookie.getValue();
+                }
+            }
+
+            if(!accessToken.isEmpty()){
+                    Map<String, Object> claims = jwtProvider.getClaims(accessToken);
+                    String loginId = (String) claims.get("memberLoginId");
+                    Member member = memberService.findByLoginId(loginId);
+                    memberService.logout(member);
+            }
+        }
+
+        Cookie accessCookie  = new Cookie("accessToken", null);
+        accessCookie .setPath("/");
+        accessCookie .setMaxAge(0);
+        httpServletResponse.addCookie(accessCookie);
+
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie .setPath("/");
+        refreshCookie .setMaxAge(0);
+        httpServletResponse.addCookie(refreshCookie);
+    }
+
     //내 정보 가져오기
     @GetMapping("/profile")
     public Member profile(HttpServletRequest httpServletRequest){
@@ -86,7 +123,7 @@ public class ApiV1MemberController {
 
         Map<String, Object> claims = jwtProvider.getClaims(accessToken);
         String loginId = (String)claims.get("memberLoginId");
-        Member member = this.memberService.profile(loginId);
+        Member member = this.memberService.findByLoginId(loginId);
         return member;
     }
 }

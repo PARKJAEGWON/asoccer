@@ -11,6 +11,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberLoginId(String memberLoginId);
     //findByMemberLoginId 옵셔널로 만들어서 프로필 메소드사용 불가 리펙토링때 공부할 요소
     //JPA에서는 by뒤에는 무조건 엔티티의 필드명과 일치해야함
-    Member findProfileByMemberLoginId(String memberLoginId);
+    Member getMemberLoginId(String memberLoginId);
     Optional<Member> findByMemberRefreshToken(String memberRefreshToken);
 }
