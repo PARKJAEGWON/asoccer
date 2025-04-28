@@ -1,8 +1,7 @@
 # 개인 프로젝트
 
 # todo 기본 베이스 개발 ing
-  회원기능
-  매칭게시글
+
   ![123321213321](https://github.com/user-attachments/assets/6a55689b-c96e-4a51-9b69-e6f94e8f3950)
 
 
