@@ -2,6 +2,7 @@ package com.groo.asoccer.domain.member.member.controller;
 
 import com.groo.asoccer.domain.member.member.dto.request.MemberLoginRequest;
 import com.groo.asoccer.domain.member.member.dto.request.MemberSignupRequest;
+import com.groo.asoccer.domain.member.member.dto.request.MemberUpdateRequest;
 import com.groo.asoccer.domain.member.member.entity.Member;
 import com.groo.asoccer.domain.member.member.service.MemberService;
 import com.groo.asoccer.global.jwt.JwtProvider;
@@ -31,6 +32,39 @@ public class ApiV1MemberController {
                 memberSignupRequest.getMemberPhone()
 //                memberSignupRequest.getMemberStatus() 회원가입때는 필드에서 디폴트 값으로 설정
         );
+        return member;
+    }
+    //회원수정
+    @PatchMapping("/{id}")
+    public Member update(@PathVariable Long id, @RequestBody MemberUpdateRequest memberUpdateRequest,HttpServletRequest httpServletRequest){
+        Cookie[] cookies = httpServletRequest.getCookies();
+
+        String accessToken = null;
+
+        if(cookies != null){
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("accessToken")){
+                    accessToken = cookie.getValue();
+                }
+            }
+        }
+        if(accessToken == null) {
+            throw  new RuntimeException("로그인이 필요합니다.");
+        }
+
+        Map<String, Object> claims = jwtProvider.getClaims(accessToken);
+        Long loginId = ((Integer)claims.get("memberId")).longValue();
+
+        if(!loginId.equals(id)){
+            throw new RuntimeException("본인만 수정할 수 있습니다.");
+        }
+
+
+        Member member = memberService.update(id,
+                memberUpdateRequest.getMemberName(),
+                memberUpdateRequest.getMemberPassword(),
+                memberUpdateRequest.getMemberPhone());
+
         return member;
     }
 

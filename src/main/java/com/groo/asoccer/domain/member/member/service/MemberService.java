@@ -40,6 +40,26 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    //회원수정
+    public Member update(Long id, String memberName, String memberPassword, String memberPhone){
+        Optional<Member> optionalMember = memberRepository.findById(id);
+            if(optionalMember.isEmpty()){
+                throw new RuntimeException("해당 ID의 회원을 찾을 수 없습니다.");  
+            }
+            Member member = optionalMember.get();
+            
+            if(memberName != null && !memberName.isBlank()){
+                member.setMemberName(memberName);
+            }
+            if(memberPassword != null && !memberPassword.isBlank()){
+                member.setMemberPassword(passwordEncoder.encode(memberPassword));
+            }
+            if(memberPhone != null && !memberPhone.isBlank()){
+                member.setMemberPhone(memberPhone);
+            }
+            return memberRepository.save(member);
+    }
+
     //로그인
     public Member login(String memberLoginId, String memberPassword){
 
@@ -75,7 +95,9 @@ public class MemberService {
 
     //유저 정보
     public Member findByLoginId(String memberLoginId){
-        return memberRepository.getMemberLoginId(memberLoginId);
+        //orElseThrow를 사용안하고싶어서 타입을 옵셔널로했더니 컨트롤러도 옵셔널로 맞춰줘야함 orElseThrow로 하면 맴버로 반환됨 레파지토리는 옵셔널 인데 이걸 사용하면 맴버로
+        //뿌려지는 이유를 찾아봐야겠음
+        return memberRepository.findByMemberLoginId(memberLoginId).orElseThrow(() -> new RuntimeException("해당 ID의 회원을 찾을 수 없습니다."));
     }
 
     //토큰 유효성 검증
