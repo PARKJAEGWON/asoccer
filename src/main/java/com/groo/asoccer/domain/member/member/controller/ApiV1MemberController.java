@@ -1,6 +1,7 @@
 package com.groo.asoccer.domain.member.member.controller;
 
 import com.groo.asoccer.domain.member.member.dto.request.MemberLoginRequest;
+import com.groo.asoccer.domain.member.member.dto.request.MemberRestoreRequest;
 import com.groo.asoccer.domain.member.member.dto.request.MemberSignupRequest;
 import com.groo.asoccer.domain.member.member.dto.request.MemberUpdateRequest;
 import com.groo.asoccer.domain.member.member.entity.Member;
@@ -122,6 +123,12 @@ public class ApiV1MemberController {
         refreshCookie .setPath("/");
         refreshCookie .setMaxAge(0);
         httpServletResponse.addCookie(refreshCookie);
+    }
+
+    //회원복구
+    @PostMapping("/restore")
+    public void restore(@RequestBody MemberRestoreRequest memberRestoreRequest){
+            memberService.restore(memberRestoreRequest.getMemberLoginId(), memberRestoreRequest.getMemberPassword());
     }
 
     //로그인

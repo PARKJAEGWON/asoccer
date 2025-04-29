@@ -81,8 +81,33 @@ public class MemberService {
         for(Member member: withdrawMembers) {
             memberRepository.delete(member);
         }
-
     }
+
+    //회원 복구
+    public void restore(String memberLoginId, String rawPassword){
+        Optional<Member> optionalMember = memberRepository.findByMemberLoginId(memberLoginId);
+        if(optionalMember.isEmpty()){
+            throw new RuntimeException("존재하지 않는 아이디입니다.");
+        }
+        Member member = optionalMember.get();
+
+        if(!passwordEncoder.matches(rawPassword, member.getMemberPassword())){
+            throw  new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if(member.getMemberStatus() != 8){
+            throw new RuntimeException("탈퇴 상태가 아닙니다.");
+        }
+        //실제로는 14일 이후 데이터 완전 소멸이라 작동하지는 않지만 혹시라도 스케줄러가 정상 작동하지않거나 데이터가 꼬일 경우를 대비해 방어적으로 남겨두는게 좋다해서 추가
+        if(member.getWithdrawDateTime() == null || member.getWithdrawDateTime().plusDays(14).isBefore(LocalDateTime.now())){
+            throw new RuntimeException("복구 가능 기간(14일)이 지났습니다. 고객센터에 문의 바랍니다.");
+        }
+
+        member.setMemberStatus(0);
+        member.setWithdrawDateTime(null);
+        memberRepository.save(member);
+    }
+
     //로그인
     public Member login(String memberLoginId, String memberPassword){
 
@@ -101,7 +126,7 @@ public class MemberService {
             throw new RuntimeException("이용이 정지된 계정입니다.");
 
         }else if(member.getMemberStatus() == 8){
-            throw new RuntimeException("탈퇴된 계정입니다. 탈퇴일로부터 30일이 지난 후 다시 가입하실 수 있습니다.");
+            throw new RuntimeException("탈퇴된 계정입니다. 탈퇴일로부터 14일이 지난 후 다시 가입하실 수 있습니다.");
         }
 
         String refreshToken = jwtProvider.generateRefreshToken(member);
