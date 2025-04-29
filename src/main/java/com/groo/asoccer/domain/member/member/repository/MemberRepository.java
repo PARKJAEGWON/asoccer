@@ -3,6 +3,8 @@ package com.groo.asoccer.domain.member.member.repository;
 import com.groo.asoccer.domain.member.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -13,4 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //JPA에서는 by뒤에는 무조건 엔티티의 필드명과 일치해야함
 //    Member findByGetMemberLoginId(String memberLoginId);
     Optional<Member> findByMemberRefreshToken(String memberRefreshToken);
+    //Before(= sql <)는 14일이 지난걸 확인 하기 위해 있어야 함
+    List<Member> findByMemberStatusAndWithdrawDateTimeBefore(int memberStatus, LocalDateTime dateTime);
 }

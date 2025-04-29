@@ -4,8 +4,13 @@ import com.groo.asoccer.global.baseEntity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -38,6 +43,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private int memberStatus = 0; // 0:이용중, 8:회원탈퇴, 9:정지
 
+    private LocalDateTime withdrawDateTime;
 
 //    @JsonIgnore
     private String memberRefreshToken;

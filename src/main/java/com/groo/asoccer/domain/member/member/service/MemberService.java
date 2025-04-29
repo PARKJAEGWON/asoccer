@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,29 @@ public class MemberService {
             }
             return memberRepository.save(member);
     }
+    //회원탈퇴상태 요청
+    public void withdrawMember(Long memberId){
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        if(optionalMember.isEmpty()){
+            throw new RuntimeException("아이디가 존재하지 않습니다.");
+        }
+        Member member = optionalMember.get();
 
+        member.setMemberStatus(8);
+        member.setWithdrawDateTime(LocalDateTime.now());
+        memberRepository.save(member);
+
+        logout(member);
+    }
+    //회원 탈퇴
+    public void deleteWithdrawMembers(){
+        LocalDateTime fourteenDays = LocalDateTime.now().minusDays(14);
+        List<Member> withdrawMembers = memberRepository.findByMemberStatusAndWithdrawDateTimeBefore(8, fourteenDays);
+        for(Member member: withdrawMembers) {
+            memberRepository.delete(member);
+        }
+
+    }
     //로그인
     public Member login(String memberLoginId, String memberPassword){
 
