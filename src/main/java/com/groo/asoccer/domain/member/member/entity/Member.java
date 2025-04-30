@@ -1,8 +1,10 @@
 package com.groo.asoccer.domain.member.member.entity;
 
+import com.groo.asoccer.domain.member.mappingMemberTeam.entity.MappingMemberTeam;
 import com.groo.asoccer.global.baseEntity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +13,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -47,6 +51,9 @@ public class Member extends BaseEntity {
 
 //    @JsonIgnore
     private String memberRefreshToken;
+
+    @OneToMany(mappedBy = "member")
+    private List<MappingMemberTeam> memberTeams = new ArrayList<>();
 
 //    private Long memberLeaderTeamId;
 }
